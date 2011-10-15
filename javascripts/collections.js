@@ -6,19 +6,20 @@ Demo.Collections.Bookmarks = Demo.Collections.Base.extend({
 	
 	model : Demo.Models.Bookmark,
 	
-	initialize : function(models, options){
-		this.user = options.user;
+	initialize : function(models, options) {
+		this.user_id = options.user_id;
 	},
 	
-	url : function(){
-		return this.user.url() + '/bookmarks';
+	url : function() {
+	  query = 'user_id="' + this.user_id + '"';
+		return '/proxy/resources/bookmarks?query=' + escape(query);
 	},
 	
 	parse : function(response) {
 	  var records = response.records;
 	  
 	  _(records).each(function(record) {
-	    record.user = this.user;
+	    record.user_id = this.user_id;
 	  }, this);
 	  
 	  this.currentPage = response.current_page;

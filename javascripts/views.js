@@ -108,7 +108,7 @@ Demo.Views.Dashboard = Demo.Views.Base.extend({
   
   initialize : function() {
     this.template = Handlebars.compile($("#dashboard-template").html());
-    this.bookmarks = new Demo.Collections.Bookmarks([], { user : this.model.get('user') });
+    this.bookmarks = new Demo.Collections.Bookmarks([], { user_id : this.model.get('user').id });
     this.bookmarks.fetch();
     this.bookmarks.bind('reset', function(bookmark) {
       this.renderBookmarks();
@@ -116,10 +116,6 @@ Demo.Views.Dashboard = Demo.Views.Base.extend({
     this.bookmarks.bind('add', function(bookmark) {
       this.renderBookmarks();
     }, this);
-    this.newBookmarkModal = new Demo.Views.NewBookmarkModal({ 
-      model : this.model.get('user')
-    });
-    this.newBookmarkModal.bind('onCreateBookmark', this.onCreateBookmark, this);
   },
   
   render : function() {
@@ -129,10 +125,9 @@ Demo.Views.Dashboard = Demo.Views.Base.extend({
   },
   
   renderBookmarks : function() {
+    $('#bookmarks').empty();
     _(this.bookmarks.models).each(function(bookmark) {
-      var view = new Demo.Views.Bookmark({
-        model: bookmark
-      });
+      var view = new Demo.Views.Bookmark({ model: bookmark });
       this.$('#bookmarks').append(view.render().el);
     });
   },
@@ -143,7 +138,14 @@ Demo.Views.Dashboard = Demo.Views.Base.extend({
   
   onNewBookmark : function(e) {
     e.preventDefault();
-    this.newBookmarkModal.render();
+    var newBookmarkModal = new Demo.Views.NewBookmarkModal({ 
+      model : this.model.get('user')
+    });
+    newBookmarkModal.bind('onCreateBookmark', this.onCreateBookmark, this);
+    newBookmarkModal.bind('onCloseModal', function() {
+      this.unbind('onCreateBookmark', this.onCreateBookmark);
+    }, this);
+    newBookmarkModal.render();
   },
   
   onCreateBookmark : function(model) {
@@ -201,6 +203,7 @@ Demo.Views.Modal = Demo.Views.Base.extend({
   },
   
   closeModal : function() {
+    this.trigger('onCloseModal');
     $(this.el).modal('hide');
   }
 
@@ -219,11 +222,11 @@ Demo.Views.NewBookmarkModal = Demo.Views.Modal.extend({
   
   onSubmit : function(e) {
     e.preventDefault();
-    var url = this.$('#url').val();
-    if (url == '')
+    var location = this.$('#location').val();
+    if (location == '')
       return;
     
-    var bookmark = new Demo.Models.Bookmark({ url : url, user : this.model });
+    var bookmark = new Demo.Models.Bookmark({ location : location, user_id : this.model.get('id') });
     bookmark.save(bookmark.toJSON(), {
       success : function(model, response) {
         this.trigger('onCreateBookmark', model);

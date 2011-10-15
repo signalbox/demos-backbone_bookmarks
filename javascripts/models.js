@@ -42,7 +42,7 @@ Demo.Models.User = Demo.Models.Base.extend({
   
   serializable : [ 'id', 'username' ],
   
-  urlRoot : '/proxy/app/users'
+  urlRoot : '/proxy/resources/users'
 
 });
 
@@ -50,11 +50,8 @@ Demo.Models.Bookmark = Demo.Models.Base.extend({
   
   defaults : {},
   
-  serializable : [ 'id', 'url' ],
+  serializable : [ 'id', 'location', 'user_id' ],
   
-  url : function() {
-    var baseUrl = this.get('user').url() + '/bookmarks';
-    return this.isNew() ? baseUrl : baseUrl + '/' + this.get('id');
-  }
+  urlRoot : '/proxy/resources/bookmarks'
 
 });

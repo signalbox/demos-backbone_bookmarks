@@ -12,8 +12,8 @@ $(function() {
     beforeSend : function(xhr) {
       xhr.setRequestHeader("Accept", "application/json");
       xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.setRequestHeader("X-SignalBox-User", "brent");
-      xhr.setRequestHeader("X-SignalBox-App", "kible");
+      xhr.setRequestHeader("X-SignalBox-UserID", "4e997eaa2388cb0208000001");
+      xhr.setRequestHeader("X-SignalBox-AppID", "4e998bbf2388cb0652000001");
       xhr.setRequestHeader("X-SignalBox-Version", 1);
     }
   });
