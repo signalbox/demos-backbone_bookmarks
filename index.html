@@ -25,6 +25,7 @@
     
     <script src="javascripts/extensions.js"></script>
     <script src="javascripts/backbone.js"></script>
+    <script src="javascripts/config.js"></script>
     <script src="javascripts/models.js"></script>
     <script src="javascripts/collections.js"></script>
     <script src="javascripts/views.js"></script>
@@ -44,20 +45,22 @@
     <div id="container" class="container"></div>
 
     <script id="nav-template" type="text/x-handlebars-template">
-      <div class="topbar-inner">
-        <div class="container-fluid">
-          <a class="brand" href="#">Demo</a>
-          <ul class="nav">
-            <li class='{{currentPage "dashboard"}}'><a href="#dashboard">Dashboard</a></li>
-            <li class='{{currentPage "about"}}'><a href="#about">About</a></li>
-          </ul>
-          <p class="pull-right">
-            Logged in as {{ user.username }}
-            |
-            <a href="#sign-out" class="sign_out">sign out</a>
-          </p>
+      {{#if user}}
+        <div class="topbar-inner">
+          <div class="container-fluid">
+            <a class="brand" href="#">Demo</a>
+            <ul class="nav">
+              <li class='{{currentPage "dashboard"}}'><a href="#dashboard">Dashboard</a></li>
+              <li class='{{currentPage "about"}}'><a href="#about">About</a></li>
+            </ul>
+            <p class="pull-right">
+              Logged in as {{ user.username }}
+              |
+              <a href="#sign-out" class="sign_out">sign out</a>
+            </p>
+          </div>
         </div>
-      </div>
+      {{/if}}
     </script>
 
     <script id="sign_in-template" type="text/x-handlebars-template">
@@ -102,7 +105,7 @@
     
     <script id="about-template" type="text/x-handlebars-template">
       <div class="row">
-        <div class="span4">
+        <div class="span16">
           <div class="page-header">
             <h1>About</h1>
           </div>

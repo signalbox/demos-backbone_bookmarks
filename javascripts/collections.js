@@ -2,6 +2,32 @@ Namespace('Demo.Collections');
 
 Demo.Collections.Base = Backbone.Collection.extend({});
 
+Demo.Collections.UsersWithUsername = Demo.Collections.Base.extend({
+  
+  model : Demo.Models.User,
+  
+  initialize : function(models, options) {
+		this.username = options.username;
+	},
+  
+  url : function() {
+	  query = 'username="' + this.username + '"';
+		return Demo.Config.url + 'resources/users?query=' + escape(query);
+	},
+	
+	// TODO: Move to superclass and use template method
+	parse : function(response) {
+	  var records = response.records;
+	  this.currentPage = response.current_page;
+	  this.perPage = response.per_page;
+	  this.total_pages = response.total_pages;
+	  this.total_records = response.total_records;
+	  
+		return records;
+	}
+  
+});
+
 Demo.Collections.Bookmarks = Demo.Collections.Base.extend({
 	
 	model : Demo.Models.Bookmark,
@@ -12,7 +38,7 @@ Demo.Collections.Bookmarks = Demo.Collections.Base.extend({
 	
 	url : function() {
 	  query = 'user_id="' + this.user_id + '"';
-		return '/proxy/resources/bookmarks?query=' + escape(query);
+		return Demo.Config.url + 'resources/bookmarks?query=' + escape(query);
 	},
 	
 	parse : function(response) {

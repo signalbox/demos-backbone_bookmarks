@@ -15,35 +15,34 @@ Demo.Views.App = Demo.Views.Base.extend({
       this.view.close();
     }
     
-    var page = this.model.get('page');
-    var user = this.model.get('user');
-    
-    // TODO: Override app toJson method
-    var data = {
-      page : this.model.get('page'),
-      user : (user != null ? user.rawAttributes() : null),
-    };
-    
-    // TODO: Dry up
+    this.renderNav();
+    this.renderPage();
+
+    return this;
+  },
+  
+  renderNav : function() {
+    var template = Handlebars.compile($("#nav-template").html());
+    $('#nav').html(template(this.model.toJSON()));
+    $('#nav').show();
+  },
+  
+  renderPage : function() {
+    var page        = this.model.get('page'),
+        ViewFactory = null;
+
     if (page == 'about') {
-      var navTemplate = Handlebars.compile($("#nav-template").html());
-      $('#nav').html(navTemplate(data));
-      $('#nav').show();
-      this.view = new Demo.Views.About({ model : this.model });
+      ViewFactory = Demo.Views.About;
     }
     else if (page == 'dashboard') {
-      var navTemplate = Handlebars.compile($("#nav-template").html());
-      $('#nav').html(navTemplate(data));
-      $('#nav').show();
-      this.view = new Demo.Views.Dashboard({ model : this.model });
+      ViewFactory = Demo.Views.Dashboard;
     }
     else {
-      $('#nav').hide();
-      this.view = new Demo.Views.SignIn({ model : this.model });
+      ViewFactory = Demo.Views.SignIn;
     }
     
+    this.view = new ViewFactory({ model : this.model });
     $(this.el).html(this.view.render({}).el);
-    return this;
   }
 
 });
@@ -68,33 +67,35 @@ Demo.Views.SignIn = Demo.Views.Base.extend({
   onSubmit : function(e) {
     e.preventDefault();
     var username = $('form #username').val();
-    var user = new Demo.Models.User({ id : username, username : username });
-    user.fetch({
+    var users = new Demo.Collections.UsersWithUsername([], { username : username });
+    users.fetch({
+      success : function(model, response) {
+        if (users.length > 0) {
+          this.model.signIn(users.at(0));
+        }
+        else {
+          this.createNewUser(username);
+        }
+      }.delegate(this),
+      error : function(model, response) {
+        // TODO:
+      }
+    });
+  },
+  
+  createNewUser : function(username) {
+    var newUser = new Demo.Models.User();
+    newUser.save({ username : username }, {
       success : this.onSignInSuccess.delegate(this),
-      error : this.onSignInError.delegate(this)
+      error : function(model, response) {
+        // TODO:
+      }
     });
   },
   
   onSignInSuccess : function(model, response) {
     this.model.signIn(model);
-  },
-  
-  onSignInError : function(model, response) {
-    if (response.status == 404) {
-      var newUser = new Demo.Models.User();
-      newUser.save({ username : model.get('username') }, {
-        success : this.onSignInSuccess.delegate(this),
-        error : function(model, response) {
-          // TODO
-        }
-      });
-    }
-    else {
-      // TODO
-    }
-  },
-  
-  onClose : function(e) {}
+  }
 
 });
 
@@ -108,13 +109,15 @@ Demo.Views.Dashboard = Demo.Views.Base.extend({
   
   initialize : function() {
     this.template = Handlebars.compile($("#dashboard-template").html());
-    this.bookmarks = new Demo.Collections.Bookmarks([], { user_id : this.model.get('user').id });
-    this.bookmarks.fetch();
-    this.bookmarks.bind('reset', function(bookmark) {
-      this.renderBookmarks();
+    
+    var bookmarks = new Demo.Collections.Bookmarks([], { user_id : this.model.get('user').id });
+    this.model.set({ bookmarks : bookmarks });
+    bookmarks.fetch();
+    bookmarks.bind('reset', function(bookmark) {
+      this.renderBookmarks(bookmarks);
     }, this);
-    this.bookmarks.bind('add', function(bookmark) {
-      this.renderBookmarks();
+    bookmarks.bind('add', function(bookmark) {
+      this.renderBookmarks(bookmarks);
     }, this);
   },
   
@@ -124,32 +127,25 @@ Demo.Views.Dashboard = Demo.Views.Base.extend({
     return this;
   },
   
-  renderBookmarks : function() {
+  renderBookmarks : function(bookmarks) {
     $('#bookmarks').empty();
-    _(this.bookmarks.models).each(function(bookmark) {
+    _(bookmarks.models).each(function(bookmark) {
       var view = new Demo.Views.Bookmark({ model: bookmark });
       this.$('#bookmarks').append(view.render().el);
     });
   },
   
   onClose : function(e) {
-    this.bookmarks.unbind();
+    this.model.get('bookmarks').unbind();
+    this.model.set({'bookmarks' : null});
   },
   
   onNewBookmark : function(e) {
     e.preventDefault();
     var newBookmarkModal = new Demo.Views.NewBookmarkModal({ 
-      model : this.model.get('user')
+      model : this.model
     });
-    newBookmarkModal.bind('onCreateBookmark', this.onCreateBookmark, this);
-    newBookmarkModal.bind('onCloseModal', function() {
-      this.unbind('onCreateBookmark', this.onCreateBookmark);
-    }, this);
     newBookmarkModal.render();
-  },
-  
-  onCreateBookmark : function(model) {
-    this.bookmarks.add(model);
   }
 
 });
@@ -226,10 +222,13 @@ Demo.Views.NewBookmarkModal = Demo.Views.Modal.extend({
     if (location == '')
       return;
     
-    var bookmark = new Demo.Models.Bookmark({ location : location, user_id : this.model.get('id') });
-    bookmark.save(bookmark.toJSON(), {
+    var user        = this.model.get('user'),
+        bookmarks   = this.model.get('bookmarks'),
+        newBookmark = new Demo.Models.Bookmark({ location : location, user_id : user.id });
+    
+    newBookmark.save(newBookmark.toJSON(), {
       success : function(model, response) {
-        this.trigger('onCreateBookmark', model);
+        bookmarks.add(model);
         this.closeModal();
       }.delegate(this),
       error : function(model, response) {

@@ -1,7 +1,6 @@
 $(function() {  
   
   // TODO: Move setup to an app object
-  
   Handlebars.registerHelper('currentPage', function(page) {
     return this.page == page ? 'active' : '';
   });
@@ -9,16 +8,19 @@ $(function() {
   $.ajaxSetup({
     cache : false,
     dataType : "json",
-    beforeSend : function(xhr) {
+    beforeSend : function(xhr, settings) {
+      var prefix = (settings.url.indexOf("?") > -1) ? "&" : "?";
+      settings.url += prefix + $.param({
+        sb_version : 1,
+        sb_user_id : "4e997eaa2388cb0208000001",
+        sb_app_id : "4e9c02692388cb3173000001"
+      });
       xhr.setRequestHeader("Accept", "application/json");
       xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.setRequestHeader("X-SignalBox-UserID", "4e997eaa2388cb0208000001");
-      xhr.setRequestHeader("X-SignalBox-AppID", "4e998bbf2388cb0652000001");
-      xhr.setRequestHeader("X-SignalBox-Version", 1);
     }
   });
   
-  var eventBus = _.extend({}, Backbone.Events);
+  var eventBus = _.extend({}, Backbone.Events);  // TODO: Remove if not in use
   var app = new Demo.Models.App();
   var appView = new Demo.Views.App({ model : app });
   var router = new Demo.Router(app);

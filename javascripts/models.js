@@ -32,6 +32,16 @@ Demo.Models.App = Demo.Models.Base.extend({
   
   signOut : function() {
     this.signIn(null);
+  },
+  
+  toJSON : function() {
+    var page = this.get('page');
+    var user = this.get('user');
+    
+    return {
+      page : page,
+      user : (user != null ? user.rawAttributes() : null),
+    };
   }
 
 });
@@ -42,7 +52,7 @@ Demo.Models.User = Demo.Models.Base.extend({
   
   serializable : [ 'id', 'username' ],
   
-  urlRoot : '/proxy/resources/users'
+  urlRoot : Demo.Config.url + 'resources/users'
 
 });
 
@@ -52,6 +62,6 @@ Demo.Models.Bookmark = Demo.Models.Base.extend({
   
   serializable : [ 'id', 'location', 'user_id' ],
   
-  urlRoot : '/proxy/resources/bookmarks'
+  urlRoot : Demo.Config.url + 'resources/bookmarks'
 
 });
