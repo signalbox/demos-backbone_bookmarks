@@ -233,6 +233,7 @@ Demo.Views.NewBookmarkModal = Demo.Views.Modal.extend({
       }.delegate(this),
       error : function(model, response) {
         // TODO:
+        alert(response.responseText);
       }
     });
   },

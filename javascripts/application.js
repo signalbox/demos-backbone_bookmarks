@@ -11,9 +11,9 @@ $(function() {
     beforeSend : function(xhr, settings) {
       var prefix = (settings.url.indexOf("?") > -1) ? "&" : "?";
       settings.url += prefix + $.param({
-        sb_version : 1,
-        sb_user_id : "4e997eaa2388cb0208000001",
-        sb_app_id : "4e9c02692388cb3173000001"
+        sb_version : Demo.Config.version,
+        sb_username : Demo.Config.username,
+        sb_app_name : Demo.Config.appName
       });
       xhr.setRequestHeader("Accept", "application/json");
       xhr.setRequestHeader("Content-Type", "application/json");
