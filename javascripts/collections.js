@@ -11,7 +11,7 @@ Demo.Collections.UsersWithUsername = Demo.Collections.Base.extend({
 	},
   
   url : function() {
-	  query = 'username="' + this.username + '"';
+	  var query = "SELECT * WHERE username = '" + this.username + "'";
 		return Demo.Config.url + 'resources/users?query=' + escape(query);
 	},
 	
@@ -37,7 +37,7 @@ Demo.Collections.Bookmarks = Demo.Collections.Base.extend({
 	},
 	
 	url : function() {
-	  query = 'user_id="' + this.user_id + '"';
+	  var query = "SELECT * WHERE user_id = '" + this.user_id + "'";
 		return Demo.Config.url + 'resources/bookmarks?query=' + escape(query);
 	},
 	
