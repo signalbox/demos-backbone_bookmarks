@@ -17,6 +17,12 @@ Demo.Collections.Base = Backbone.Collection.extend({
     return response.records;
   },
 
+  get : function(id){
+    return this.find(function(m){
+      return m.get('_id') === id;
+    })
+  },
+
   buildQuery : function(query, replacements){
     _(replacements).each(function(value, key){
       query = query.replace(new RegExp("{" + key + "}", "ig"), value);

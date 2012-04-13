@@ -2,6 +2,8 @@ Demo.Collections.UsersWithUsername = Demo.Collections.Base.extend({
 
   model : Demo.Models.User,
 
+  urlRoot : Demo.Config.url + 'resources/users',
+
   initialize : function(models, options) {
     this.username = options.username;
   },
