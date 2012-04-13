@@ -6,14 +6,14 @@ var Namespace = function(name){
     root[part] = root[part] || {};
     root = root[part];
   });
-  
+
   return root;
 };
 
 if(!Function.delegate){
 	Function.prototype.delegate = function(scope, args){
 		var fn = this;
-		
+
 		return function(){
 			return fn.apply(scope, args || arguments);
 		};
@@ -33,7 +33,7 @@ if(!Array.toSentence){
         sentence = "";
         break;
       case 1:
-        sentence = content[0].toString(); 
+        sentence = content[0].toString();
         break;
       case 2:
         sentence = content[0].toString() + lastWordConnector + content[1].toString();
@@ -43,4 +43,13 @@ if(!Array.toSentence){
     }
     return sentence;
   };
+};
+
+Backbone.View.prototype.close = function() {
+  this.remove();
+  this.unbind();
+
+  if(this.onClose){
+    this.onClose();
+  }
 };

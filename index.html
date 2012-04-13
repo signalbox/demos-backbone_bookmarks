@@ -1,141 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Backbone Bookmarks</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
+<head>
+  <meta charset="utf-8">
+  <title>Backbone Bookmarks</title>
+  <link rel="stylesheet" type="text/css" href="vendor/stylesheets/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/styles.css" />
 
-    <link rel="stylesheet" type="text/css" href="vendor/stylesheets/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/styles.css" />
- 
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-      }
-    </style>
+  <script src="vendor/javascripts/underscore-1.3.3.js"></script>
+  <script src="vendor/javascripts/jquery-1.7.2.js"></script>
+  <script src="vendor/javascripts/backbone-0.9.2.js"></script>
+  <script src="vendor/javascripts/handlebars-1.0.0.beta.3.js"></script>
+  <script src="vendor/javascripts/bootstrap.js"></script>
 
-    <script src="vendor/javascripts/underscore-1.1.7.js"></script>
-    <script src="vendor/javascripts/underscore.string.js"></script>
-    <script src="vendor/javascripts/json2.js"></script>
-    <script src="vendor/javascripts/jquery-1.6.3.js"></script>
-    <script src="vendor/javascripts/backbone-0.5.3.js"></script>
-    <script src="vendor/javascripts/handlebars-1.0.0.beta.3.js"></script>
-    <script src="vendor/javascripts/bootstrap-modal.js"></script>
-    
-    <script src="javascripts/extensions.js"></script>
-    <script src="javascripts/backbone.js"></script>
-    <script src="javascripts/config.js"></script>
-    <script src="javascripts/models.js"></script>
-    <script src="javascripts/collections.js"></script>
-    <script src="javascripts/views.js"></script>
-    <script src="javascripts/router.js"></script>
-    <script src="javascripts/application.js"></script>
+  <script src="javascripts/extensions.js"></script>
+  <script src="javascripts/helpers.js"></script>
+  <script src="javascripts/config.js"></script>
+  <script src="javascripts/errors.js"></script>
+  <script src="javascripts/models/base.js"></script>
+  <script src="javascripts/models/app.js"></script>
+  <script src="javascripts/models/user.js"></script>
+  <script src="javascripts/models/bookmark.js"></script>
+  <script src="javascripts/collections/base.js"></script>
+  <script src="javascripts/collections/bookmarks.js"></script>
+  <script src="javascripts/collections/users_with_username.js"></script>
+  <script src="javascripts/views/base.js"></script>
+  <script src="javascripts/views/modal.js"></script>
+  <script src="javascripts/views/about.js"></script>
+  <script src="javascripts/views/app.js"></script>
+  <script src="javascripts/views/dashboard.js"></script>
+  <script src="javascripts/views/sign_in.js"></script>
+  <script src="javascripts/views/bookmarks.js"></script>
+  <script src="javascripts/views/new_bookmark.js"></script>
+  <script src="javascripts/router.js"></script>
+  <script src="javascripts/application.js"></script>
+</head>
+<body>
 
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
-  </head>
+  <div id="nav" class="navbar navbar-fixed-top"></div>
 
-  <body>
-    
-    <div id="nav" class="topbar"></div>
-    
-    <div id="container" class="container"></div>
+  <div id="container" class="container"></div>
 
-    <script id="nav-template" type="text/x-handlebars-template">
-      {{#if user}}
-        <div class="topbar-inner">
-          <div class="container-fluid">
-            <a class="brand" href="#">Demo</a>
-            <ul class="nav">
-              <li class='{{currentPage "dashboard"}}'><a href="#dashboard">Dashboard</a></li>
-              <li class='{{currentPage "about"}}'><a href="#about">About</a></li>
-            </ul>
-            <p class="pull-right">
-              Logged in as {{ user.username }}
-              |
-              <a href="#sign-out" class="sign_out">sign out</a>
-            </p>
-          </div>
-        </div>
-      {{/if}}
-    </script>
-
-    <script id="sign_in-template" type="text/x-handlebars-template">
+  <script id="nav-template" type="text/x-handlebars-template">
+    <div class="navbar-inner">
       <div class="container">
-        <div class="row">
-          <div class="span8 offset4">
-            <div class="page-header">
-              <h1>Sign In</h1>
-            </div>
-            <form action="/proxy/app/users" method="post" accept-charset="utf-8">
-              <fieldset>
-                <div class="clearfix">
-                  <label for="username">Username</label>
-                  <div class="input">
-                    <input class="xlarge" id="username" name="username" size="30" type="text" />
-                  </div>
-                </div>
-                <div class="actions">
-                  <input type="submit" class="btn primary" value="Sign in">
-                </div>
-              </fieldset>
-            </form>
-          </div>
-        </div>
+        {{#if user}}
+          <a class="brand" href="#dashboard">Demo</a>
+        {{else}}
+          <a class="brand" href="#about">Demo</a>
+        {{/if}}
+
+        <ul class="nav">
+          {{#if user}}
+            <li class='{{currentPage "dashboard"}}'><a href="#dashboard">Dashboard</a></li>
+          {{/if}}
+
+          <li class='{{currentPage "about"}}'><a href="#about">About</a></li>
+        </ul>
+
+          <ul class="nav pull-right">
+            {{#if user}}
+              <li><a href="#dashboard">Signed in as {{ user.username }}</a></li>
+              <li class="divider-vertical"></li>
+              <li><a href="#sign-out" class="sign_out">Sign Out</a></li>
+            {{else}}
+              <li><a href="#sign-in" class="sign_in">Sign In</a></li>
+            {{/if}}
+          </ul>
       </div>
-    </script>
-    
-    <script id="dashboard-template" type="text/x-handlebars-template">
-      <div class="row">
-        <div class="span4">
-          <button class="btn primary new_bookmark">Add</button>
-        </div>
-        <div class="span12">
-          <div class="page-header">
-            <h1>Dashboard</h1>
-          </div>
-          <div id="bookmarks">
-          </div>
-        </div>
+    </div>
+  </script>
+
+  <script id="sign_in-template" type="text/x-handlebars-template">
+    <div class="modal" style="position: relative; top: auto; left: auto; margin: 0 auto;">
+      <div class="modal-header">
+        <h3>Sign In</h3>
       </div>
-    </script>
-    
-    <script id="about-template" type="text/x-handlebars-template">
-      <div class="row">
-        <div class="span16">
-          <div class="page-header">
-            <h1>About</h1>
-          </div>
-        </div>
-      </div>
-    </script>
-    
-    <script id="new_bookmark_modal-template" type="text/x-handlebars-template">
-      <h1>New Bookmark</h1>
+
       <form action="" method="post" accept-charset="utf-8">
-        <fieldset>
-          <div class="clearfix">
-            <label for="username">Url</label>
-            <div class="input">
-              <input class="xlarge" id="location" name="location" size="30" type="text" />
-            </div>
-          </div>
-          <div class="actions">
-            <input type="submit" class="btn primary" value="Create">
-            <button type="reset" class="btn">Cancel</button>
-          </div>
-        </fieldset>
+        <div class="modal-body">
+          <fieldset>
+            <label for="username">Username</label>
+            <input class="xlarge" id="username" name="username" size="30" type="text" />
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-primary" value="Sign in">
+        </div>
       </form>
-    </script>
-    
-    <script id="bookmark-template" type="text/x-handlebars-template">
-      <p>
-        {{ location }}
-      </p>
-    </script>
-    
-  </body>
+    </div>
+  </script>
+
+  <script id="dashboard-template" type="text/x-handlebars-template">
+    <button class="btn primary new_bookmark"><i class="icon-plus"></i> Add Bookmark</button>
+
+    <div class="page-header">
+      <h1>Dashboard</h1>
+    </div>
+
+    <div id="bookmarks"><img src="images/loading.gif"/></div>
+  </script>
+
+  <script id="about-template" type="text/x-handlebars-template">
+    <div class="page-header">
+      <h1>About</h1>
+    </div>
+
+    <p>This is a demo application built using <a href="http://documentcloud.github.com/backbone/" target="_blank">Backbone JS</a> and <a href="http://getsignalbox.com" target="_blank">Signal Box</a>. The source code for this application can be found on <a href="https://github.com/signalbox/demos-backbone_bookmarks" target="_blank">GitHub</a>.</p>
+  </script>
+
+  <script id="new_bookmark-template" type="text/x-handlebars-template">
+    <div class="modal">
+      <a href="#" class="close" data-dismiss="modal">×</a>
+
+      <div class="modal-header">
+        <h3>New Bookmark</h3>
+      </div>
+
+      <form action="" method="post" accept-charset="utf-8">
+        <div class="modal-body">
+          <fieldset>
+            <label for="username">URL</label>
+            <input class="xlarge" id="location" name="location" size="30" type="text" />
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <input type="reset" class="btn" value="Close">
+          <input type="submit" class="btn btn-primary" value="Add">
+        </div>
+      </form>
+    </div>
+  </script>
+
+  <script id="bookmarks-template" type="text/x-handlebars-template">
+    {{#if bookmarks.length}}
+      <table class="table table-striped table-condensed">
+          <thead>
+            <tr>
+              <th>URL</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each bookmarks}}
+              <tr>
+                <td><code>{{ location }}</code></td>
+                <td><a href="{{ location }}" class="btn" target="_blank"><i class="icon-share-alt"></i> Open</a></td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+    {{else}}
+      <p>No bookmarks yet :(</p>
+    {{/if}}
+  </script>
+
+</body>
 </html>
